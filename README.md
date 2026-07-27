@@ -1,3 +1,50 @@
+<<<<<<< HEAD
+=======
+# Instalação limpa — SGV9 corrigido
+
+Esta versão alinha o backend e o banco de dados, incluindo empresas, perfis, permissões, auditoria, usuários, localidades e representadas.
+
+## Instalação no WSL2
+
+> Faça backup de dados importantes. A instalação limpa abaixo remove o volume antigo do MySQL.
+
+```bash
+cd ~/sgv9_web
+cp .env.example .env
+nano .env
+docker compose down -v
+docker compose up -d --build
+docker compose ps
+```
+
+Acesse:
+
+- Sistema: `http://localhost`
+- phpMyAdmin: `http://localhost:8080`
+
+Credenciais iniciais do sistema:
+
+- E-mail: `admin@sgv9.com.br`
+- Senha: `password`
+
+Na primeira utilização, altere a senha em **Administração → Usuários**.
+
+## Atualização substituindo a pasta atual
+
+```bash
+cd ~
+mv sgv9_web sgv9_web_backup
+unzip SGV9-corrigido.zip
+mv SGV9-corrigido sgv9_web
+cd ~/sgv9_web
+cp .env.example .env
+nano .env
+docker compose up -d --build
+```
+
+---
+
+>>>>>>> 8ea7486 (chore: Correções)
 <div align="center">
 
 # SGV9

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*==============================================================*/
 /* SGV9 - DDL V2                                                */
 /* ERP enxuto para escritórios de representação comercial       */
@@ -924,3 +925,313 @@ CREATE INDEX idx_logs_empresa_data ON logs_usuarios (empresa_id, criado_em);
 CREATE INDEX idx_logs_entidade_registro ON logs_usuarios (entidade, registro_id);
 
 SET FOREIGN_KEY_CHECKS = 1;
+=======
+SET NAMES utf8mb4;
+SET time_zone = '-03:00';
+
+CREATE TABLE empresas (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  razao_social VARCHAR(200) NOT NULL,
+  nome_fantasia VARCHAR(200) NOT NULL,
+  cnpj VARCHAR(18) NULL,
+  email VARCHAR(200) NULL,
+  telefone VARCHAR(20) NULL,
+  ativo TINYINT(1) NOT NULL DEFAULT 1,
+  criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_empresas_cnpj (cnpj)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE perfis (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(100) NOT NULL,
+  descricao VARCHAR(255) NULL,
+  UNIQUE KEY uq_perfis_nome (nome)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE permissoes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  codigo VARCHAR(100) NOT NULL,
+  descricao VARCHAR(255) NOT NULL,
+  UNIQUE KEY uq_permissoes_codigo (codigo)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE perfil_permissoes (
+  perfil_id INT NOT NULL,
+  permissao_id INT NOT NULL,
+  PRIMARY KEY (perfil_id, permissao_id),
+  CONSTRAINT fk_pp_perfil FOREIGN KEY (perfil_id) REFERENCES perfis(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_pp_permissao FOREIGN KEY (permissao_id) REFERENCES permissoes(id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE usuarios (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  empresa_id INT NOT NULL,
+  perfil_id INT NOT NULL,
+  nome VARCHAR(200) NOT NULL,
+  email VARCHAR(200) NOT NULL,
+  senha VARCHAR(255) NOT NULL,
+  ativo TINYINT(1) NOT NULL DEFAULT 1,
+  ultimo_login_em DATETIME NULL,
+  data_criacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_usuarios_email (email),
+  KEY idx_usuarios_empresa (empresa_id),
+  KEY idx_usuarios_perfil (perfil_id),
+  CONSTRAINT fk_usuarios_empresa FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_usuarios_perfil FOREIGN KEY (perfil_id) REFERENCES perfis(id) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE logs_usuarios (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  empresa_id INT NOT NULL,
+  usuario_id INT NULL,
+  acao VARCHAR(100) NOT NULL,
+  entidade VARCHAR(100) NULL,
+  registro_id VARCHAR(100) NULL,
+  dados_anteriores JSON NULL,
+  dados_novos JSON NULL,
+  endereco_ip VARCHAR(45) NULL,
+  user_agent VARCHAR(500) NULL,
+  criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_logs_empresa (empresa_id),
+  KEY idx_logs_usuario (usuario_id),
+  CONSTRAINT fk_logs_empresa FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_logs_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE estados (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(100) NOT NULL,
+  sigla CHAR(2) NOT NULL,
+  UNIQUE KEY uq_estados_nome (nome),
+  UNIQUE KEY uq_estados_sigla (sigla)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE cidades (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(150) NOT NULL,
+  estado_id INT NOT NULL,
+  UNIQUE KEY uq_cidades_estado (estado_id,nome),
+  CONSTRAINT fk_cidades_estado FOREIGN KEY (estado_id) REFERENCES estados(id) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE bairros (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(200) NOT NULL,
+  cidade_id INT NOT NULL,
+  UNIQUE KEY uq_bairros_cidade (cidade_id,nome),
+  CONSTRAINT fk_bairros_cidade FOREIGN KEY (cidade_id) REFERENCES cidades(id) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE representadas (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  empresa_id INT NOT NULL,
+  nome VARCHAR(200) NOT NULL,
+  cnpj VARCHAR(18) NOT NULL,
+  inscricao_estadual VARCHAR(20) NULL,
+  logradouro VARCHAR(200) NULL,
+  numero VARCHAR(20) NULL,
+  complemento VARCHAR(200) NULL,
+  bairro_id INT NULL,
+  cep VARCHAR(9) NULL,
+  telefone VARCHAR(20) NULL,
+  email VARCHAR(150) NULL,
+  ativo TINYINT(1) NOT NULL DEFAULT 1,
+  observacao TEXT NULL,
+  criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_representadas_empresa_cnpj (empresa_id,cnpj),
+  KEY idx_representadas_empresa (empresa_id),
+  KEY idx_representadas_bairro (bairro_id),
+  CONSTRAINT fk_representadas_empresa FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_representadas_bairro FOREIGN KEY (bairro_id) REFERENCES bairros(id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE categorias (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(100) NOT NULL UNIQUE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE subcategorias (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(100) NOT NULL,
+  categoria_id INT NOT NULL,
+  UNIQUE KEY uq_subcategorias_categoria (categoria_id,nome),
+  CONSTRAINT fk_subcategorias_categoria FOREIGN KEY (categoria_id) REFERENCES categorias(id) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE clientes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  empresa_id INT NOT NULL,
+  datacad DATE NOT NULL,
+  nomefantasia VARCHAR(200) NOT NULL,
+  razaosocial VARCHAR(200) NOT NULL,
+  cnpj VARCHAR(18) NOT NULL,
+  inscr_est VARCHAR(20) NOT NULL,
+  inscr_mun VARCHAR(20) NULL,
+  telefone VARCHAR(20) NULL,
+  email VARCHAR(100) NOT NULL,
+  subcategorias_id INT NOT NULL,
+  credito DECIMAL(19,4) NOT NULL DEFAULT 0,
+  obs TEXT NULL,
+  ativo TINYINT(1) NOT NULL DEFAULT 1,
+  UNIQUE KEY uq_clientes_empresa_cnpj (empresa_id,cnpj),
+  CONSTRAINT fk_clientes_empresa FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_clientes_subcategoria FOREIGN KEY (subcategorias_id) REFERENCES subcategorias(id) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE vendedores (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  empresa_id INT NOT NULL,
+  nome VARCHAR(200) NOT NULL,
+  cpf VARCHAR(14) NOT NULL,
+  endereco VARCHAR(200) NOT NULL,
+  complemento VARCHAR(200) NULL,
+  numero VARCHAR(10) NULL,
+  bairro_id INT NOT NULL,
+  cep VARCHAR(9) NOT NULL,
+  telefone VARCHAR(20) NULL,
+  celular VARCHAR(20) NULL,
+  email VARCHAR(200) NOT NULL,
+  obs TEXT NULL,
+  ativo TINYINT(1) NOT NULL DEFAULT 1,
+  UNIQUE KEY uq_vendedores_empresa_cpf (empresa_id,cpf),
+  CONSTRAINT fk_vendedores_empresa FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_vendedores_bairro FOREIGN KEY (bairro_id) REFERENCES bairros(id) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE transportes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  empresa_id INT NOT NULL,
+  nomefantasia VARCHAR(200) NOT NULL,
+  razaosocial VARCHAR(200) NOT NULL,
+  cnpj VARCHAR(18) NOT NULL,
+  inscr_est VARCHAR(20) NOT NULL,
+  endereco VARCHAR(200) NOT NULL,
+  complemento VARCHAR(200) NULL,
+  numero VARCHAR(20) NULL,
+  bairro_id INT NOT NULL,
+  cep VARCHAR(9) NOT NULL,
+  obs TEXT NULL,
+  ativo TINYINT(1) NOT NULL DEFAULT 1,
+  UNIQUE KEY uq_transportes_empresa_cnpj (empresa_id,cnpj),
+  CONSTRAINT fk_transportes_empresa FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_transportes_bairro FOREIGN KEY (bairro_id) REFERENCES bairros(id) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE frete (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  frete VARCHAR(20) NOT NULL UNIQUE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE pagamentos (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  pagamento VARCHAR(50) NOT NULL,
+  representada_id INT NULL,
+  UNIQUE KEY uq_pagamentos_representada (representada_id,pagamento),
+  CONSTRAINT fk_pagamentos_representada FOREIGN KEY (representada_id) REFERENCES representadas(id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE tipopedidos (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  tipo VARCHAR(50) NOT NULL UNIQUE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE statuspedidos (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  status VARCHAR(50) NOT NULL UNIQUE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE pedidos (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  empresa_id INT NOT NULL,
+  data DATE NOT NULL,
+  dataprograma DATE NULL,
+  numero VARCHAR(20) NULL,
+  oc VARCHAR(20) NULL,
+  cliente_id INT NOT NULL,
+  representada_id INT NOT NULL,
+  pagamentos_id INT NOT NULL,
+  transportes_id INT NOT NULL,
+  vendedor_id INT NOT NULL,
+  frete_id INT NOT NULL,
+  tipopedido_id INT NOT NULL,
+  desconto DECIMAL(19,4) NULL,
+  desc_adicional DECIMAL(19,4) NULL,
+  status_id INT NOT NULL,
+  valor_total DECIMAL(19,4) NULL,
+  valor_total_cipi DECIMAL(19,4) NULL,
+  obs VARCHAR(400) NULL,
+  KEY idx_pedidos_empresa (empresa_id),
+  CONSTRAINT fk_pedidos_empresa FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_pedidos_cliente FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_pedidos_representada FOREIGN KEY (representada_id) REFERENCES representadas(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_pedidos_pagamento FOREIGN KEY (pagamentos_id) REFERENCES pagamentos(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_pedidos_transporte FOREIGN KEY (transportes_id) REFERENCES transportes(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_pedidos_vendedor FOREIGN KEY (vendedor_id) REFERENCES vendedores(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_pedidos_frete FOREIGN KEY (frete_id) REFERENCES frete(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_pedidos_tipo FOREIGN KEY (tipopedido_id) REFERENCES tipopedidos(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_pedidos_status FOREIGN KEY (status_id) REFERENCES statuspedidos(id) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+DELIMITER $$
+
+CREATE TRIGGER bi_empresas BEFORE INSERT ON empresas FOR EACH ROW
+BEGIN
+  SET NEW.razao_social = UPPER(TRIM(NEW.razao_social));
+  SET NEW.nome_fantasia = UPPER(TRIM(NEW.nome_fantasia));
+  SET NEW.email = IF(NEW.email IS NULL, NULL, LOWER(TRIM(NEW.email)));
+END$$
+CREATE TRIGGER bu_empresas BEFORE UPDATE ON empresas FOR EACH ROW
+BEGIN
+  SET NEW.razao_social = UPPER(TRIM(NEW.razao_social));
+  SET NEW.nome_fantasia = UPPER(TRIM(NEW.nome_fantasia));
+  SET NEW.email = IF(NEW.email IS NULL, NULL, LOWER(TRIM(NEW.email)));
+END$$
+
+CREATE TRIGGER bi_usuarios BEFORE INSERT ON usuarios FOR EACH ROW
+BEGIN
+  SET NEW.nome = UPPER(TRIM(NEW.nome));
+  SET NEW.email = LOWER(TRIM(NEW.email));
+END$$
+CREATE TRIGGER bu_usuarios BEFORE UPDATE ON usuarios FOR EACH ROW
+BEGIN
+  SET NEW.nome = UPPER(TRIM(NEW.nome));
+  SET NEW.email = LOWER(TRIM(NEW.email));
+END$$
+
+CREATE TRIGGER bi_estados BEFORE INSERT ON estados FOR EACH ROW
+BEGIN SET NEW.nome=UPPER(TRIM(NEW.nome)); SET NEW.sigla=UPPER(TRIM(NEW.sigla)); END$$
+CREATE TRIGGER bu_estados BEFORE UPDATE ON estados FOR EACH ROW
+BEGIN SET NEW.nome=UPPER(TRIM(NEW.nome)); SET NEW.sigla=UPPER(TRIM(NEW.sigla)); END$$
+CREATE TRIGGER bi_cidades BEFORE INSERT ON cidades FOR EACH ROW
+BEGIN SET NEW.nome=UPPER(TRIM(NEW.nome)); END$$
+CREATE TRIGGER bu_cidades BEFORE UPDATE ON cidades FOR EACH ROW
+BEGIN SET NEW.nome=UPPER(TRIM(NEW.nome)); END$$
+CREATE TRIGGER bi_bairros BEFORE INSERT ON bairros FOR EACH ROW
+BEGIN SET NEW.nome=UPPER(TRIM(NEW.nome)); END$$
+CREATE TRIGGER bu_bairros BEFORE UPDATE ON bairros FOR EACH ROW
+BEGIN SET NEW.nome=UPPER(TRIM(NEW.nome)); END$$
+
+CREATE TRIGGER bi_representadas BEFORE INSERT ON representadas FOR EACH ROW
+BEGIN
+  SET NEW.nome=UPPER(TRIM(NEW.nome));
+  SET NEW.inscricao_estadual=IF(NEW.inscricao_estadual IS NULL,NULL,UPPER(TRIM(NEW.inscricao_estadual)));
+  SET NEW.logradouro=IF(NEW.logradouro IS NULL,NULL,UPPER(TRIM(NEW.logradouro)));
+  SET NEW.numero=IF(NEW.numero IS NULL,NULL,UPPER(TRIM(NEW.numero)));
+  SET NEW.complemento=IF(NEW.complemento IS NULL,NULL,UPPER(TRIM(NEW.complemento)));
+  SET NEW.email=IF(NEW.email IS NULL,NULL,LOWER(TRIM(NEW.email)));
+  SET NEW.observacao=IF(NEW.observacao IS NULL,NULL,UPPER(TRIM(NEW.observacao)));
+END$$
+CREATE TRIGGER bu_representadas BEFORE UPDATE ON representadas FOR EACH ROW
+BEGIN
+  SET NEW.nome=UPPER(TRIM(NEW.nome));
+  SET NEW.inscricao_estadual=IF(NEW.inscricao_estadual IS NULL,NULL,UPPER(TRIM(NEW.inscricao_estadual)));
+  SET NEW.logradouro=IF(NEW.logradouro IS NULL,NULL,UPPER(TRIM(NEW.logradouro)));
+  SET NEW.numero=IF(NEW.numero IS NULL,NULL,UPPER(TRIM(NEW.numero)));
+  SET NEW.complemento=IF(NEW.complemento IS NULL,NULL,UPPER(TRIM(NEW.complemento)));
+  SET NEW.email=IF(NEW.email IS NULL,NULL,LOWER(TRIM(NEW.email)));
+  SET NEW.observacao=IF(NEW.observacao IS NULL,NULL,UPPER(TRIM(NEW.observacao)));
+END$$
+
+DELIMITER ;
+>>>>>>> 8ea7486 (chore: Correções)
