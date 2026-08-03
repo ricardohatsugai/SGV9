@@ -46,8 +46,7 @@ ALTER TABLE cidades
     ADD COLUMN atualizado_em TIMESTAMP NOT NULL
         DEFAULT CURRENT_TIMESTAMP
         ON UPDATE CURRENT_TIMESTAMP
-        AFTER criado_em,
-    ADD CONSTRAINT uq_cidades_estado UNIQUE (nome, estado_id);
+        AFTER criado_em;
 
 /* Bairros */
 ALTER TABLE bairros
