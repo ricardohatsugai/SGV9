@@ -122,3 +122,92 @@ docker compose up -d --build
 ## Limite desta entrega
 
 Os arquivos de backend e frontend não estavam presentes no material disponibilizado. Portanto, esta entrega implementa integralmente a camada de banco e documenta o contrato necessário para a interface e a API.
+
+
+---
+
+# Edição e Gerenciamento de Localidades
+
+## Objetivo
+
+Permitir o gerenciamento completo dos cadastros de estados, cidades e bairros, preservando a integridade dos dados e o histórico das informações cadastradas.
+
+## Funcionalidades
+
+As seguintes funcionalidades passaram a fazer parte do módulo de Localidades:
+
+- Cadastro de Estados;
+- Cadastro de Cidades;
+- Cadastro de Bairros;
+- Edição de Estados;
+- Edição de Cidades;
+- Edição de Bairros;
+- Inativação de Estados;
+- Inativação de Cidades;
+- Inativação de Bairros;
+- Reativação de Estados;
+- Reativação de Cidades;
+- Reativação de Bairros.
+
+## Regras de Negócio
+
+- Os registros não devem ser excluídos fisicamente quando houver relacionamentos com outros módulos do sistema.
+- A inativação preserva todo o histórico de utilização da localidade.
+- Localidades inativas não devem ser apresentadas nos cadastros de novos registros.
+- Durante a edição de um cadastro já existente, a localidade atualmente vinculada continua disponível para seleção, mesmo que esteja inativa.
+- O sistema impede o cadastro de cidades duplicadas dentro do mesmo estado.
+- O sistema impede o cadastro de bairros duplicados dentro da mesma cidade.
+
+## Alterações no Banco de Dados
+
+As tabelas abaixo passaram a possuir os seguintes campos de controle:
+
+### estados
+
+- ativo
+- criado_em
+- atualizado_em
+
+### cidades
+
+- ativo
+- criado_em
+- atualizado_em
+
+### bairros
+
+- ativo
+- criado_em
+- atualizado_em
+
+Além disso, a tabela **cidades** possui restrição de unicidade para impedir registros duplicados utilizando a combinação:
+
+```text
+estado_id + nome
+```
+
+## Migração
+
+As alterações estruturais desta funcionalidade são aplicadas através da migration:
+
+```text
+database/migrations/004-localidades-editaveis.sql
+```
+
+Para instalações novas, essas alterações já fazem parte do arquivo:
+
+```text
+init-scripts/01-ddl.sql
+```
+
+## Impacto em Outros Módulos
+
+O cadastro de Representadas passou a considerar apenas localidades ativas durante novos cadastros.
+
+Na edição de um registro existente, a localidade atualmente vinculada permanece disponível para preservar a consistência dos dados históricos.
+
+# Histórico
+
+| Versão | Data | Alteração |
+|---------|------|-----------|
+| 0.1.0 | 03/08/2026 | Inclusão de edição, inativação, reativação e auditoria de localidades. |
