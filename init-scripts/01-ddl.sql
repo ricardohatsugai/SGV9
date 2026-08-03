@@ -258,6 +258,10 @@ CREATE TABLE representadas (
     telefone VARCHAR(20),
     email VARCHAR(150),
     ativo BOOLEAN NOT NULL DEFAULT TRUE,
+    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em TIMESTAMP NOT NULL 
+        DEFAULT CURRENT_TIMESTAMP 
+        ON UPDATE CURRENT_TIMESTAMP,
     observacao TEXT,
     CONSTRAINT uq_representadas_empresa_cnpj UNIQUE (empresa_id, cnpj),
     CONSTRAINT fk_representadas_empresa

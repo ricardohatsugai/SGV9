@@ -27,13 +27,35 @@ if ($id > 0) {
 }
 if ($bairroSelecionado > 0) { $representada['bairro_id'] = $bairroSelecionado; }
 
-$bairros = $pdo->query(
-    'SELECT b.id, b.nome AS bairro, c.nome AS cidade, e.sigla
-     FROM bairros b
-     INNER JOIN cidades c ON c.id = b.cidade_id
-     INNER JOIN estados e ON e.id = c.estado_id
-     ORDER BY e.sigla, c.nome, b.nome'
-)->fetchAll();
+$sqlBairros = '
+    SELECT
+        b.id,
+        b.nome AS bairro,
+        c.nome AS cidade,
+        e.sigla
+    FROM bairros b
+    INNER JOIN cidades c ON c.id = b.cidade_id
+    INNER JOIN estados e ON e.id = c.estado_id
+    WHERE (
+        b.ativo = 1
+        AND c.ativo = 1
+        AND e.ativo = 1
+    )
+';
+
+$paramsBairros = [];
+
+if (!empty($representada['bairro_id'])) {
+    $sqlBairros .= ' OR b.id = :bairro_atual';
+    $paramsBairros['bairro_atual'] = (int) $representada['bairro_id'];
+}
+
+$sqlBairros .= ' ORDER BY e.sigla, c.nome, b.nome';
+
+$stmtBairros = $pdo->prepare($sqlBairros);
+$stmtBairros->execute($paramsBairros);
+
+$bairros = $stmtBairros->fetchAll();
 
 renderHeader($id ? 'Editar representada' : 'Nova representada', 'Informe os dados cadastrais e de contato.');
 ?>
