@@ -13,18 +13,20 @@
   - Corrigir o texto corrompido de SÃO PAULO, quando existente.
 
   IMPORTANTE
-  - Execute uma única vez no banco existente.
+  - Esta migration deve ser executada apenas em bancos onde estas
+    alterações ainda não tenham sido aplicadas.
+  - Verifique previamente a estrutura das tabelas.
   - Faça backup antes da execução.
+  - ALTER TABLE no MySQL provoca commit implícito; esta migration
+    não possui rollback transacional global.
   - A exclusão física continua bloqueada pelas chaves estrangeiras.
 */
-
-START TRANSACTION;
 
 /* Correções conhecidas da carga inicial */
 UPDATE estados
    SET sigla = 'BA'
  WHERE nome = 'BAHIA'
-   AND sigla = 'BA';
+   AND sigla = 'BH';
 
 UPDATE cidades
    SET nome = 'SÃO PAULO'
@@ -57,7 +59,6 @@ ALTER TABLE bairros
         ON UPDATE CURRENT_TIMESTAMP
         AFTER criado_em;
 
-COMMIT;
 
 /* Validação pós-migração */
 SELECT id, nome, sigla, ativo, criado_em, atualizado_em
