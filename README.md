@@ -250,14 +250,11 @@ O sistema foi dividido em módulos independentes.
 
 Exemplo
 
-```text
 backend/
+├── localidades/
+├── usuarios/
+└── representadas/
 
-localidades/
-
-usuarios/
-
-representadas/
 ```
 
 Cada módulo deverá possuir suas próprias regras de negócio, telas e persistência de dados.
@@ -304,10 +301,10 @@ Toda alteração deverá possuir uma migration correspondente.
 
 ## Versão 9.1
 
-- Cadastro de Usuários
-- Representadas
-- Localidades
-- Permissões
+- [x] Cadastro de Usuários
+- [x] Representadas
+- [x] Localidades
+- [x] Permissões
 
 ## Versão 9.2
 
@@ -338,6 +335,25 @@ Toda alteração deverá possuir uma migration correspondente.
 - Todo código deverá passar por revisão antes do merge.
 
 ---
+
+## Módulo de Localidades
+
+O módulo de Localidades permite gerenciar:
+
+- Estados
+- Cidades
+- Bairros
+
+Funcionalidades disponíveis:
+
+- cadastro;
+- edição;
+- ativação e inativação;
+- prevenção de duplicidades;
+- validação de relacionamentos entre Estado, Cidade e Bairro;
+- bloqueio de inativação quando existirem registros ativos dependentes.
+
+As operações de escrita utilizam controle de permissão e proteção CSRF.
 
 # Licença
 
