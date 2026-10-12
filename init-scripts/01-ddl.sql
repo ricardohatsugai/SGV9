@@ -168,21 +168,26 @@ CREATE TABLE tipos_endereco (
 CREATE TABLE enderecos_clientes (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     cliente_id INT UNSIGNED NOT NULL,
-    tipo_endereco_id TINYINT UNSIGNED NOT NULL,
+    tipo_endereco_id INT NOT NULL,
     logradouro VARCHAR(200) NOT NULL,
     numero VARCHAR(20),
     complemento VARCHAR(200),
-    bairro_id INT UNSIGNED NOT NULL,
+    bairro_id INT NOT NULL,
     cep VARCHAR(9) NOT NULL,
     contato VARCHAR(100),
     telefone VARCHAR(20),
     celular VARCHAR(20),
     email VARCHAR(150),
     principal BOOLEAN NOT NULL DEFAULT FALSE,
+    ativo BOOLEAN NOT NULL DEFAULT TRUE,
+    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    principal_ativo TINYINT GENERATED ALWAYS AS (CASE WHEN ativo = 1 AND principal = 1 THEN 1 ELSE NULL END) STORED,
     observacao TEXT,
+    CONSTRAINT uq_enderecos_cliente_principal UNIQUE (cliente_id, principal_ativo),
     CONSTRAINT fk_enderecos_clientes_cliente
         FOREIGN KEY (cliente_id) REFERENCES clientes(id)
-        ON UPDATE CASCADE ON DELETE CASCADE,
+        ON UPDATE CASCADE ON DELETE RESTRICT,
     CONSTRAINT fk_enderecos_clientes_tipo
         FOREIGN KEY (tipo_endereco_id) REFERENCES tipos_endereco(id)
         ON UPDATE CASCADE ON DELETE RESTRICT,
@@ -205,11 +210,14 @@ CREATE TABLE contatos_clientes (
     telefone VARCHAR(20),
     celular VARCHAR(20),
     email VARCHAR(150),
+    ativo BOOLEAN NOT NULL DEFAULT TRUE,
+    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     observacao TEXT,
     CONSTRAINT uq_contatos_clientes UNIQUE (cliente_id, departamento_id, nome),
     CONSTRAINT fk_contatos_clientes_cliente
         FOREIGN KEY (cliente_id) REFERENCES clientes(id)
-        ON UPDATE CASCADE ON DELETE CASCADE,
+        ON UPDATE CASCADE ON DELETE RESTRICT,
     CONSTRAINT fk_contatos_clientes_departamento
         FOREIGN KEY (departamento_id) REFERENCES departamentos_clientes(id)
         ON UPDATE CASCADE ON DELETE RESTRICT

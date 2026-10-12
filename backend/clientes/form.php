@@ -26,6 +26,11 @@ $subcategorias = $pdo->query('SELECT s.id, s.nome, c.nome AS categoria FROM subc
 
 renderHeader($id ? 'Editar cliente' : 'Novo cliente', 'Informe os dados cadastrais e de contato.');
 ?>
+<?php if ($id): ?>
+<div class="toolbar"><a class="button secondary" href="/clientes/detalhes.php?id=<?= $id ?>">Gerenciar endereços e contatos</a></div>
+<?php else: ?>
+<p>Salve o cliente para cadastrar seus endereços e contatos.</p>
+<?php endif; ?>
 <?php if (!$subcategorias): ?>
     <div class="flash error">Não existem subcategorias de clientes cadastradas. Solicite a configuração ao administrador antes de salvar.</div>
 <?php endif; ?>

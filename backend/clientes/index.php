@@ -70,6 +70,7 @@ renderHeader('Clientes', 'Cadastro comercial dos clientes do escritório.');
                     <td><?= e($cliente['telefone'] ?? '—') ?><small><?= e($cliente['email'] ?? '') ?></small></td>
                     <td><span class="status <?= $cliente['ativo'] ? 'active' : 'inactive' ?>"><?= $cliente['ativo'] ? 'Ativo' : 'Inativo' ?></span></td>
                     <td class="actions">
+                        <a href="/clientes/detalhes.php?id=<?= (int) $cliente['id'] ?>">Endereços e contatos</a>
                         <?php if ($gerenciar): ?>
                             <a href="/clientes/form.php?id=<?= (int) $cliente['id'] ?>">Editar</a>
                             <form action="/clientes/alterar-status.php" method="post" class="action-form">

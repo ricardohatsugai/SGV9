@@ -309,7 +309,7 @@ Toda alteração deverá possuir uma migration correspondente.
 ## Versão 9.2
 
 - [x] Clientes (cadastro principal, edição e ativação/inativação)
-- [ ] Endereços e contatos de clientes
+- [x] Endereços e múltiplos contatos de clientes
 - Produtos
 - Pedidos
 
@@ -360,10 +360,13 @@ As operações de escrita utilizam controle de permissão e proteção CSRF.
 
 O cadastro principal de Clientes permite buscar, cadastrar, editar, inativar e
 reativar registros por empresa, com permissões, CSRF, validação de CNPJ e auditoria.
-Endereços e múltiplos contatos serão entregues posteriormente.
+Cada cliente possui abas para endereços e múltiplos contatos, com edição e
+inativação, preservação de localidades históricas e controle de endereço principal.
 
 Antes de usar em bancos existentes, execute a migration
 `database/migrations/006-clientes-cadastro.sql`, após backup e revisão do schema.
+Para endereços e contatos, aplique também
+`database/migrations/007-clientes-enderecos-contatos.sql`.
 Requisitos, cuidados de implantação e testes: [Clientes](docs/requisitos/clientes.md).
 
 # Licença
