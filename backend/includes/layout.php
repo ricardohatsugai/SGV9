@@ -51,7 +51,7 @@ function renderHeader(string $titulo, string $subtitulo = ''): void
             <?php endif; ?>
 
             <?php if (usuarioTemPermissao('CLIENTES_VISUALIZAR')): ?>
-            <a href="#" class="disabled"><span>◎</span> Clientes <small>em breve</small></a>
+            <a href="/clientes/index.php" class="<?= str_starts_with($_SERVER['REQUEST_URI'], '/clientes') ? 'active' : '' ?>"><span>◎</span> Clientes</a>
             <?php endif; ?>
 
             <?php if (usuarioTemPermissao('PRODUTOS_VISUALIZAR')): ?>
