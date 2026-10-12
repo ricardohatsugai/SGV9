@@ -23,7 +23,7 @@ function renderHeader(string $titulo, string $subtitulo = ''): void
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($titulo) ?> | SGV9</title>
-    <link rel="stylesheet" href="/assets/css/admin.css">
+    <link rel="stylesheet" href="/assets/css/admin.css?v=<?= filemtime(__DIR__ . '/../assets/css/admin.css') ?>">
 </head>
 <body>
 <div class="app-shell">
