@@ -16,7 +16,8 @@ Versão 0.3
 ✔ Validação de CNPJ
 
 Versão 0.4
-⬜ Clientes
+✔ Clientes — cadastro principal, edição, busca e ativação/inativação
+⬜ Clientes — endereços e múltiplos contatos
 
 Versão 0.5
 ⬜ Produtos
