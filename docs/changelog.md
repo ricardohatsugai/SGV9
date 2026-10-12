@@ -17,7 +17,7 @@ Versão 0.3
 
 Versão 0.4
 ✔ Clientes — cadastro principal, edição, busca e ativação/inativação
-⬜ Clientes — endereços e múltiplos contatos
+✔ Clientes — endereços e múltiplos contatos, principal e inativação (12/10/2026)
 
 Versão 0.5
 ⬜ Produtos

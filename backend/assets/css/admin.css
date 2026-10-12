@@ -55,3 +55,10 @@ input.input-valid{border-color:#12b76a}input.input-invalid{border-color:#f04438}
 .actions {
     white-space: nowrap;
 }
+
+.cliente-relacionados td:first-child {
+    min-width: 220px;
+    max-width: 360px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}

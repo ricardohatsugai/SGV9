@@ -176,6 +176,8 @@ try {
         verificar(requestTeste('/representadas/index.php')['status']===200,'Regressão da listagem de Representadas');
     }
 
+    require '/tmp/sgv9-relacionados-clientes-test.php';
+
     // Simula falha de auditoria: a transação deve desfazer a atualização.
     sessaoTeste(901,$todas);
     session_id($sessionId); session_start(); $_SESSION['usuario_id']=999999; session_write_close();

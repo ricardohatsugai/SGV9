@@ -124,6 +124,16 @@ try {
      * ativos vinculados em Representadas, Transportes ou Vendedores.
      */
     if ($novoStatus === 0) {
+        $enderecos = $pdo->prepare('SELECT COUNT(*) FROM enderecos_clientes ec
+            JOIN clientes cl ON cl.id=ec.cliente_id
+            WHERE ec.bairro_id=:bairro_id AND ec.ativo=1 AND cl.ativo=1');
+        $enderecos->execute(['bairro_id'=>$id]);
+        if ((int)$enderecos->fetchColumn() > 0) {
+            $pdo->rollBack();
+            flash('error', 'Não é possível inativar este bairro porque existem endereços ativos de clientes ativos vinculados.');
+            header("Location: {$redirect}");
+            exit;
+        }
         $dependencias = [
             [
                 'tabela' => 'representadas',

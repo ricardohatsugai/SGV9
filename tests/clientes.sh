@@ -17,6 +17,8 @@ cleanup() {
 trap cleanup EXIT
 docker cp tests/clientes.php "$php_container":/tmp/sgv9-clientes-test.php
 docker cp tests/migration-clientes.php "$php_container":/tmp/sgv9-migration-clientes-test.php
+docker cp tests/relacionados-clientes.php "$php_container":/tmp/sgv9-relacionados-clientes-test.php
+docker cp tests/migration-relacionados.php "$php_container":/tmp/sgv9-migration-relacionados-test.php
 for schema in legado novo; do
 docker compose exec -T db sh -c '
     MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -u root -e "CREATE DATABASE \`$1\` CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci; GRANT ALL ON \`$1\`.* TO '\''$MYSQL_USER'\''@'\''%'\'';"
@@ -39,7 +41,17 @@ docker compose exec -T -e DB_DATABASE="$test_db" php php /tmp/sgv9-migration-cli
 mysql_test < database/migrations/006-clientes-cadastro.sql
 mysql_test < database/migrations/006-clientes-cadastro.sql
 docker compose exec -T -e DB_DATABASE="$test_db" php php /tmp/sgv9-migration-clientes-test.php verify
-docker compose exec -T -e DB_DATABASE="$test_db" -e SGV9_TEST_SCHEMA="$schema" php php /tmp/sgv9-clientes-test.php
+mysql_test < database/migrations/007-clientes-enderecos-contatos.sql
+docker compose exec -T -e DB_DATABASE="$test_db" php php /tmp/sgv9-migration-relacionados-test.php seed
+if mysql_test < database/migrations/007-clientes-enderecos-contatos.sql; then
+    echo 'ERRO: migration 007 aceitou vários principais ativos.'
+    exit 1
+fi
+docker compose exec -T -e DB_DATABASE="$test_db" php php /tmp/sgv9-migration-relacionados-test.php resolver-conflito
+mysql_test < database/migrations/007-clientes-enderecos-contatos.sql
+mysql_test < database/migrations/007-clientes-enderecos-contatos.sql
+docker compose exec -T -e DB_DATABASE="$test_db" php php /tmp/sgv9-migration-relacionados-test.php verify
+docker compose exec -T -e DB_DATABASE="$test_db" -e SGV9_TEST_SCHEMA="$schema" -e SGV9_CAPTURE_UI="${SGV9_CAPTURE_UI:-0}" php php /tmp/sgv9-clientes-test.php
 cleanup
 done
 trap - EXIT
