@@ -308,7 +308,8 @@ Toda alteração deverá possuir uma migration correspondente.
 
 ## Versão 9.2
 
-- Clientes
+- [x] Cadastro básico de Clientes
+- [ ] Complementos de Clientes: endereços, contatos, documentos e vendedor
 - Produtos
 - Pedidos
 
@@ -354,6 +355,18 @@ Funcionalidades disponíveis:
 - bloqueio de inativação quando existirem registros ativos dependentes.
 
 As operações de escrita utilizam controle de permissão e proteção CSRF.
+
+## Módulo de Clientes
+
+O cadastro básico permite listar, pesquisar, incluir, editar, ativar e inativar
+clientes por empresa, com classificação, contato e limite de crédito. Inclui
+validação de CNPJ, proteção CSRF, permissões, auditoria transacional e conferência
+de alterações concorrentes. Para banco existente, aplicar
+`database/migrations/006-clientes-permissoes.sql` e refazer o login.
+
+O SGV10 é uma referência funcional externa; o SGV9 mantém sua implementação PHP/MySQL.
+Consulte a [matriz de funcionalidades](docs/requisitos/paridade-sgv10.md) e o
+[roadmap](docs/roadmap.md) para as próximas entregas e os limites desta primeira etapa.
 
 # Licença
 
