@@ -23,11 +23,12 @@ if (
 
 $id = 0;
 
+// O formulário envia zero para cadastrar um bairro novo.
 if (isset($_POST['id']) && $_POST['id'] !== '') {
     $idValidado = filter_var(
         $_POST['id'],
         FILTER_VALIDATE_INT,
-        ['options' => ['min_range' => 1]]
+        ['options' => ['min_range' => 0]]
     );
 
     if ($idValidado === false) {
